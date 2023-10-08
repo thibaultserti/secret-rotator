@@ -1,0 +1,18 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - type: bind
+        source: ./secretrotator.yaml
+        target: /secretrotator.yaml
+        read_only: true
+      - type: bind
+        source: ./test/sa.json
+        target: /sa.json
+        read_only: true
+    env_file:
+      - .env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=sa.json
