@@ -27,36 +27,47 @@ func GetGCPServiceAccountJSONKey(serviceAccountName string, projectID string, ma
 		return "", err
 	}
 
-	keyRequest := &iam.CreateServiceAccountKeyRequest{}
-	key, err := iamService.Projects.ServiceAccounts.Keys.Create("projects/"+projectID+"/serviceAccounts/"+serviceAccountName, keyRequest).Do()
-	if err != nil {
-		logrus.Errorf("Error when creating key: %v\n", err)
-		return "", err
-	}
-
-	keys, err := iamService.Projects.ServiceAccounts.Keys.List("projects/" + projectID + "/serviceAccounts/" + serviceAccountName).Do()
+	keys_, err := iamService.Projects.ServiceAccounts.Keys.List("projects/" + projectID + "/serviceAccounts/" + serviceAccountName).Do()
 	if err != nil {
 		logrus.Errorf("Error when getting existing keys: %v\n", err)
 		return "", err
 	}
-	nbKeys := len(keys.Keys) - 1 // there is always one system managed key not visible in the UI
 
-	sort.Slice(keys.Keys, func(i, j int) bool {
-		timeI, _ := time.Parse(time.RFC3339Nano, keys.Keys[i].ValidAfterTime)
-		timeJ, _ := time.Parse(time.RFC3339Nano, keys.Keys[j].ValidAfterTime)
+	keys := []*iam.ServiceAccountKey{}
+
+	// Filter to only check USER_MANAGED keys
+	for _, key := range keys_.Keys {
+		if key.KeyType == "USER_MANAGED" {
+			keys = append(keys, key)
+		}
+
+	}
+
+	sort.Slice(keys, func(i, j int) bool {
+		timeI, _ := time.Parse(time.RFC3339Nano, keys[i].ValidAfterTime)
+		timeJ, _ := time.Parse(time.RFC3339Nano, keys[j].ValidAfterTime)
 		return timeI.Before(timeJ)
 	})
 
-	if nbKeys > maxNbConcurrent {
-		// i=1 to ignore system managed key
-		for i := 1; i < nbKeys-maxNbConcurrent+1; i++ {
-			keyToDelete := keys.Keys[i]
+	nbKeys := len(keys)
+
+	if nbKeys >= maxNbConcurrent {
+		for i := 0; i < nbKeys-maxNbConcurrent+1; i++ {
+			logrus.Info(keys[i].Name)
+			keyToDelete := keys[i]
 			_, err := iamService.Projects.ServiceAccounts.Keys.Delete(keyToDelete.Name).Do()
 			if err != nil {
 				logrus.Errorf("Error when deleting key: %v\n", err)
 				return "", err
 			}
 		}
+	}
+
+	keyRequest := &iam.CreateServiceAccountKeyRequest{}
+	key, err := iamService.Projects.ServiceAccounts.Keys.Create("projects/"+projectID+"/serviceAccounts/"+serviceAccountName, keyRequest).Do()
+	if err != nil {
+		logrus.Errorf("Error when creating key: %v\n", err)
+		return "", err
 	}
 
 	keyJSON, err := base64.StdEncoding.DecodeString(key.PrivateKeyData)

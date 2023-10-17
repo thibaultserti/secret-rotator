@@ -84,7 +84,6 @@ func LoadConfig(config_file string) (config Configuration, err error) {
 	}
 	defaults.SetDefaults(&config)
 
-	logrus.Info(config)
 	return
 }
 
