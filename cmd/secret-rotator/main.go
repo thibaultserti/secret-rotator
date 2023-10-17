@@ -15,7 +15,11 @@ import (
 func main() {
 	var configuration config.Configuration
 
-	configPath := "secretrotator.yaml"
+	configPath := os.Getenv("SECRETOTATOR_CONFIG_PATH")
+	if configPath == "" {
+		configPath = "/app/secretrotator.yaml"
+	}
+
 	configuration, err := config.LoadConfig(configPath)
 	if err != nil {
 		logrus.Fatal("Cannot load configuration")
