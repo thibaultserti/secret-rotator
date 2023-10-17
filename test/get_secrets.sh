@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# Script used by CI to populate files from github secret
+
 echo "$GOTEST_GCP_SA_KEY_JSON" > test/sa.json
 
 

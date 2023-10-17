@@ -25,7 +25,8 @@ $ make build
 $ make run
 ```
 
-Configuration is retrieved from `secretrotator.yaml`. (See structure below)
+Configuration is retrieved from `secretrotator.yaml` by default. (See structure below)
+Path can be configured from the env var `SECRETROTATOR_CONFIG_PATH`.
 You can take example from the `secretrotator.example.yaml` file or from the configuration file in `test/`
 
 `.env` contains the secrets used to connect to the multiple backends. (See `.env.example` and the configuration section below)
