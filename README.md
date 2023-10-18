@@ -44,25 +44,25 @@ As for the local mode, you'll need to fill the `secretrotator.yaml` configuratio
 
 ## Configuration
 
-| **input**                                | **required** | **default** | **supported value**         | **description**                                                                   |
-| ---------------------------------------- | ------------ | ----------- | --------------------------- | --------------------------------------------------------------------------------- |
-| env                                      | False        | prod        | any string                  | environment, used to configure logger format                                      |
-| logLevel                                 | False        | info        | trace/debug/info/warn/error | log level for the logger                                                          |
-| providers.\<id\>                         | True         | N/A         | any string                  | Id used to match configuration in the secrets section                             |
-| providers.\<id\>.type                    | True         | N/A         | gitlab/gcp                  | Backend use either as a secret source or a secret destination                     |
-| providers.\<id\>.repoUrl                 | False        | ""          | any string                  | Url used to communicate with the backend API. Not used for gcp                    |
-| providers.\<id\>.apiToken                | True         | ""          | ""                          | Token used to communicate. Needs to be set to "" to be overrides by env vars      |
-| secrets.name                             | True         | N/A         |                             | Name of the secret rotation operation                                             |
-| secrets[].source.id                      | True         | N/A         | any string                  | Must match the id of a previously declared provider                               |
-| secrets[].source.type                    | True         | N/A         | gcp_sa/gitlab_project       | Source type to write/read the secret                                              |
-| secrets[].source.path                    | True         | N/A         | any string                  | Path where to write or read the secret. (repo path for gitlab, projectId for gcp) |
-| secrets[].source.secretName              | True         | N/A         | any string                  | Secret name (variable key for gitlab, SA email for gcp)                           |
-| secrets[].source.options.nbMaxConcurrent | False        | 2           | any int                     | Nb max of versions of the secret to keep (not used for gitlab_project)            |
-| secrets[].dest[].id                      | True         | N/A         | any int                     | Nb max of versions of the secret to keep (not used for gitlab_project)            |
-| secrets[].dest[].type                    | True         | N/A         | any int                     | Nb max of versions of the secret to keep (not used for gitlab_project)            |
-| secrets[].dest[].path                    | True         | N/A         | any int                     | Nb max of versions of the secret to keep (not used for gitlab_project)            |
-| secrets[].dest[].secretName              | True         | N/A         | any int                     | Nb max of versions of the secret to keep (not used for gitlab_project)            |
-| secrets[].dest[].options.base64          | False        | false       | any int                     | Nb max of versions of the secret to keep (not used for gitlab_project)            |
+| **input**                                | **required** | **default** | **supported value**                   | **description**                                                                                                      |
+| ---------------------------------------- | ------------ | ----------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| env                                      | False        | prod        | any string                            | Environment, used to configure logger format.                                                                        |
+| logLevel                                 | False        | info        | `trace`/`debug`/`info`/`warn`/`error` | Log level for the logger.                                                                                            |
+| providers.\<id\>                         | True         | N/A         | any string                            | Arbitrary ID, used to match configuration in the secrets section.                                                    |
+| providers.\<id\>.type                    | True         | N/A         | `gitlab`/`gcp`                        | Backend use either as a secret source or a secret destination.                                                       |
+| providers.\<id\>.repoUrl                 | False        | ""          | any string                            | URL used to communicate with the backend API. Not used for GCP.                                                      |
+| providers.\<id\>.apiToken                | True         | ""          | any string                            | Token used to communicate with the backend API. Needs to be set to "" to be overrides by env vars. Not used for GCP. |
+| secrets.name                             | True         | N/A         |                                       | Arbitrary ame of the secret rotation operation.                                                                      |
+| secrets[].source.id                      | True         | N/A         | any string                            | Must match the ID of a previously declared provider.                                                                 |
+| secrets[].source.type                    | True         | N/A         | `gcp_sa`                              | Source type to read the secret.                                                                                      |
+| secrets[].source.path                    | True         | N/A         | any string                            | Path where to read the secret: GCP projectId.                                                                        |
+| secrets[].source.secretName              | True         | N/A         | any string                            | Secret name: GCP SA email.                                                                                           |
+| secrets[].source.options.nbMaxConcurrent | False        | 2           | any int                               | Max number of versions of the secret to keep.                                                                        |
+| secrets[].dest[].id                      | True         | N/A         | any int                               | Must match the ID of a previously declared provider.                                                                 |
+| secrets[].dest[].type                    | True         | N/A         | `gitlab_project`                      | Source type to write the secret.                                                                                     |
+| secrets[].dest[].path                    | True         | N/A         | any int                               | Path where to write the secret: GitLab repo path.                                                                    |
+| secrets[].dest[].secretName              | True         | N/A         | any int                               | Secret name: GitLab CI variable key.                                                                                 |
+| secrets[].dest[].options.base64          | False        | false       | any int                               | Enables or disables base64 encoding of secrets.                                                                      |
 
 Every non array option has a corresponding environment variable.
 For example `providers.gitlab.type` corresponds to `SECRETROTATOR_PROVIDERS_GITLAB_TYPE`.
